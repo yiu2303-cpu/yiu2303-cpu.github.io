@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="color-scheme" content="light">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#B3EBF2">
     <meta name="referrer" content="no-referrer">
-    <meta name="description" content="九龍灣站往航天城實時巴士到站時間（城巴 E22、E22X、A22），資料來自 DATA.GOV.HK。">
-    <meta property="og:title" content="九龍灣 → 航天城 · 巴士到站時間">
-    <meta property="og:description" content="城巴實時到站：九龍灣站往航天城（E22 / E22X / A22）">
+    <meta name="description" content="鑽石山或黃大仙往國泰城實時巴士到站時間（城巴 E22、E22X、E22A、E22P、E22C），資料來自 DATA.GOV.HK。">
+    <meta property="og:title" content="鑽石山／黃大仙 → 國泰城 · 巴士到站時間">
+    <meta property="og:description" content="城巴實時到站：鑽石山站或黃大仙（龍翔道）往國泰城">
     <meta property="og:type" content="website">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>九龍灣 → 航天城 · 巴士到站時間</title>
+    <title>鑽石山／黃大仙 → 國泰城 · 巴士到站時間</title>
     <style>
         :root {
-            --blue: #2563eb;
-            --blue-dark: #1d4ed8;
-            --ink: #1e293b;
+            --theme: #B3EBF2;
+            --theme-deep: #0e7490;
+            --theme-mid: #0891b2;
+            --ink: #0f172a;
             --muted: #64748b;
-            --line: #e2e8f0;
-            --bg: #f1f5f9;
+            --line: #cfe8ec;
+            --bg: #eef8fa;
             --card: #fff;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -34,7 +35,7 @@
             padding-bottom: calc(var(--safe-bottom) + 1rem);
             -webkit-font-smoothing: antialiased;
         }
-        a { color: var(--blue); }
+        a { color: var(--theme-deep); }
         button { font: inherit; cursor: pointer; }
         .shell {
             width: min(72rem, calc(100% - 1.5rem));
@@ -47,10 +48,10 @@
             position: sticky;
             top: 0;
             z-index: 20;
-            background: var(--blue);
-            color: #fff;
+            background: var(--theme);
+            color: var(--ink);
             padding-top: var(--safe-top);
-            border-bottom: 1px solid rgb(29 78 216 / 0.25);
+            border-bottom: 1px solid #8fd4de;
         }
         .top-row {
             display: flex;
@@ -64,7 +65,7 @@
             font-weight: 700;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: #dbeafe;
+            color: var(--theme-deep);
         }
         h1 { margin: 0.15rem 0 0; font-size: 1rem; line-height: 1.3; }
         .title-long { display: none; }
@@ -73,7 +74,7 @@
         #live-status {
             display: none;
             border-radius: 999px;
-            background: rgb(255 255 255 / 0.15);
+            background: rgb(14 116 144 / 0.12);
             padding: 0.25rem 0.65rem;
             font-size: 11px;
             font-weight: 700;
@@ -82,7 +83,7 @@
             display: flex;
             overflow: hidden;
             border-radius: 999px;
-            background: rgb(255 255 255 / 0.15);
+            background: rgb(14 116 144 / 0.12);
             padding: 2px;
             font-size: 11px;
             font-weight: 800;
@@ -90,14 +91,14 @@
         .lang button {
             border: 0;
             background: transparent;
-            color: rgb(255 255 255 / 0.85);
+            color: var(--theme-deep);
             border-radius: 999px;
             padding: 0.4rem 0.65rem;
             min-height: 44px;
         }
         .lang button.is-on {
             background: #fff;
-            color: var(--blue-dark);
+            color: var(--ink);
         }
         #refresh-btn {
             display: inline-flex;
@@ -108,7 +109,8 @@
             border: 0;
             border-radius: 999px;
             background: #fff;
-            color: var(--blue-dark);
+            color: var(--theme-deep);
+            box-shadow: 0 1px 2px rgb(14 116 144 / 0.18);
         }
         #refresh-btn:disabled { opacity: 0.6; }
         #refresh-icon.spin { animation: spin 0.8s linear infinite; }
@@ -116,9 +118,36 @@
             margin: 0;
             padding-bottom: 0.75rem;
             font-size: 11px;
-            color: #dbeafe;
+            color: var(--theme-deep);
         }
         main { padding: 0.75rem 0 1.5rem; }
+        .origin {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .origin button {
+            min-height: 48px;
+            border: 1px solid #cfe8ec;
+            border-radius: 1rem;
+            background: #fff;
+            color: var(--ink);
+            font-weight: 700;
+            padding: 0.65rem 0.75rem;
+        }
+        .origin button.is-on {
+            background: var(--theme);
+            border-color: var(--theme-mid);
+            box-shadow: inset 0 0 0 2px var(--theme-mid);
+        }
+        .origin button small {
+            display: block;
+            margin-top: 0.15rem;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+        }
         .hero {
             display: grid;
             grid-template-columns: 1fr;
@@ -128,7 +157,7 @@
             background: var(--card);
             border-radius: 1rem;
             box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
-            border: 1px solid rgb(226 232 240 / 0.9);
+            border: 1px solid rgb(207 232 236 / 0.9);
         }
         .journey-m {
             display: grid;
@@ -143,8 +172,8 @@
             padding-top: 0.25rem;
         }
         .dot { width: 10px; height: 10px; border-radius: 999px; }
-        .dot-a { background: var(--blue); }
-        .dot-b { background: #38bdf8; }
+        .dot-a { background: var(--theme-deep); }
+        .dot-b { background: var(--theme-mid); }
         .rail-line { width: 1px; flex: 1; margin: 0.25rem 0; background: var(--line); }
         .lbl {
             margin: 0;
@@ -158,7 +187,7 @@
         .hint { margin: 0.15rem 0 0; font-size: 12px; color: var(--muted); }
         .stack > div + div { margin-top: 0.75rem; }
         .journey-d { display: none; }
-        .arrow { font-size: 1.5rem; font-weight: 300; color: #cbd5e1; padding: 0 0.5rem; }
+        .arrow { font-size: 1.5rem; font-weight: 300; color: #9fd0d8; padding: 0 0.5rem; }
         .pad { padding: 1rem 1.25rem; }
         .routes {
             display: grid;
@@ -166,7 +195,7 @@
             gap: 0.5rem;
         }
         .routes .card { text-align: center; padding: 0.65rem 0.5rem; }
-        .routes .name { font-size: 1.125rem; }
+        .routes .name { font-size: 1.05rem; }
         #mobile-status { margin: 0.5rem 0 0; font-size: 12px; font-weight: 600; color: #047857; }
         #eta-container {
             margin-top: 0.75rem;
@@ -181,12 +210,12 @@
             background: var(--card);
             border-radius: 1rem;
             padding: 0.75rem;
-            border: 1px solid rgb(226 232 240 / 0.9);
+            border: 1px solid rgb(207 232 236 / 0.9);
             box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
         }
         .eta-card.is-next {
-            background: #eff6ff;
-            border: 2px solid var(--blue);
+            background: #f2fbfd;
+            border: 2px solid var(--theme-mid);
         }
         .badge {
             display: flex;
@@ -196,9 +225,9 @@
             height: 3rem;
             padding: 0 0.5rem;
             border-radius: 0.75rem;
-            background: var(--blue);
+            background: var(--theme-deep);
             color: #fff;
-            font-size: 1.125rem;
+            font-size: 1rem;
             font-weight: 800;
             flex-shrink: 0;
         }
@@ -214,14 +243,14 @@
             gap: 0.25rem;
         }
         .mins b {
-            font-size: 1.65rem;
+            font-size: 1.45rem;
             font-variant-numeric: tabular-nums;
             line-height: 1;
         }
         .mins span { font-size: 11px; font-weight: 700; color: #94a3b8; }
         .clock { margin: 0.15rem 0 0; font-size: 10px; color: #94a3b8; font-variant-numeric: tabular-nums; }
         .tone-due { color: #059669; }
-        .tone-soon { color: var(--blue); }
+        .tone-soon { color: var(--theme-deep); }
         .tone-later { color: var(--ink); }
         .tone-na { color: #94a3b8; }
         .banner {
@@ -239,7 +268,7 @@
             background: #fff;
             border-radius: 1rem;
             padding: 1rem;
-            border: 1px solid rgb(226 232 240 / 0.9);
+            border: 1px solid rgb(207 232 236 / 0.9);
             font-size: 0.9rem;
             color: #475569;
         }
@@ -284,12 +313,13 @@
                 align-items: center;
             }
             .name { font-size: 1rem; }
-            .routes .card { padding: 1rem 0.75rem; }
-            .routes .name { font-size: 1.5rem; }
+            .routes { grid-template-columns: repeat(5, 1fr); }
+            .routes .card { padding: 1rem 0.5rem; }
+            .routes .name { font-size: 1.25rem; }
             #mobile-status { display: none; }
             #eta-container { margin-top: 1rem; }
             .eta-card { padding: 1rem; }
-            .mins b { font-size: 1.875rem; }
+            .mins b { font-size: 1.75rem; }
         }
         @media (min-width: 768px) {
             #eta-container { grid-template-columns: 1fr 1fr; }
@@ -313,8 +343,8 @@
             <div class="grow">
                 <p class="kicker" data-i18n="kicker">城巴實時到站</p>
                 <h1>
-                    <span class="title-short" data-i18n="titleShort">九龍灣 → 航天城</span>
-                    <span class="title-long" data-i18n="titleLong">九龍灣站 → 航天城</span>
+                    <span class="title-short" id="title-short" data-i18n="titleShort">鑽石山 → 國泰城</span>
+                    <span class="title-long" id="title-long" data-i18n="titleLong">鑽石山站 → 國泰城</span>
                 </h1>
             </div>
             <div class="actions">
@@ -335,6 +365,16 @@
 
     <main class="shell">
         <noscript>此頁需要 JavaScript 才能顯示實時到站時間。This page needs JavaScript for live bus ETAs.</noscript>
+        <div class="origin" role="group" aria-label="上車地點">
+            <button type="button" id="origin-dh" data-origin="diamondHill">
+                <span data-i18n="originDh">鑽石山</span>
+                <small data-i18n="originDhHint">龍翔道 · 鑽石山站</small>
+            </button>
+            <button type="button" id="origin-wts" data-origin="wongTaiSin">
+                <span data-i18n="originWts">黃大仙</span>
+                <small data-i18n="originWtsHint">龍翔道 · 沙田坳道</small>
+            </button>
+        </div>
         <div class="hero">
             <section class="card">
                 <div class="journey-m">
@@ -346,12 +386,12 @@
                     <div class="stack">
                         <div>
                             <p class="lbl" data-i18n="board">上車</p>
-                            <p class="name" data-i18n="boardStop">九龍灣站</p>
-                            <p class="hint" data-i18n="boardHint">觀塘道 · 往機場／航天城方向</p>
+                            <p class="name" id="board-stop-m">鑽石山站</p>
+                            <p class="hint" id="board-hint-m">龍翔道 · 往機場／航天城方向</p>
                         </div>
                         <div>
                             <p class="lbl" data-i18n="alight">下車</p>
-                            <p class="name" data-i18n="alightStop">航天城</p>
+                            <p class="name" data-i18n="alightStop">國泰城</p>
                             <p class="hint" data-i18n="alightHint">觀景路</p>
                         </div>
                     </div>
@@ -359,31 +399,18 @@
                 <div class="journey-d">
                     <div class="pad">
                         <p class="lbl" data-i18n="board">上車</p>
-                        <p class="name" data-i18n="boardStop">九龍灣站</p>
-                        <p class="hint" data-i18n="boardHint">觀塘道 · 往機場／航天城方向</p>
+                        <p class="name" id="board-stop-d">鑽石山站</p>
+                        <p class="hint" id="board-hint-d">龍翔道 · 往機場／航天城方向</p>
                     </div>
                     <div class="arrow" aria-hidden="true">→</div>
                     <div class="pad">
                         <p class="lbl" data-i18n="alight">下車</p>
-                        <p class="name" data-i18n="alightStop">航天城</p>
+                        <p class="name" data-i18n="alightStop">國泰城</p>
                         <p class="hint" data-i18n="alightHint">觀景路</p>
                     </div>
                 </div>
             </section>
-            <div class="routes" data-i18n-aria="routesAria" aria-label="途經此行程的路線">
-                <div class="card">
-                    <p class="lbl" data-i18n="allDay">全日</p>
-                    <p class="name">E22</p>
-                </div>
-                <div class="card">
-                    <p class="lbl" data-i18n="peak">繁忙時間</p>
-                    <p class="name">E22X</p>
-                </div>
-                <div class="card">
-                    <p class="lbl" data-i18n="cityflyer">機場快線</p>
-                    <p class="name">A22</p>
-                </div>
-            </div>
+            <div class="routes" id="route-chips" data-i18n-aria="routesAria" aria-label="途經此行程的路線"></div>
         </div>
         <p id="mobile-status"></p>
         <div id="eta-container" aria-live="polite">
@@ -392,9 +419,8 @@
         <details class="notes">
             <summary data-i18n="corridorTitle">本走廊路線說明</summary>
             <ul>
-                <li data-i18n="noteE22"></li>
-                <li data-i18n="noteE22X"></li>
-                <li data-i18n="noteA22"></li>
+                <li data-i18n="noteRoutes"></li>
+                <li data-i18n="noteStops"></li>
                 <li data-i18n="noteSkip"></li>
             </ul>
         </details>
@@ -410,28 +436,44 @@
             "use strict";
             var API_BASE = "https://rt.data.gov.hk/v2/transport/citybus";
             var COMPANY = "CTB";
-            var BOARD_STOP_ID = "001500";
             var REFRESH_MS = 30000;
             var FETCH_MS = 12000;
             var LANG_KEY = "bus-eta-lang";
-            var ROUTES = ["E22", "E22X", "A22"];
+            var ORIGIN_KEY = "bus-eta-origin";
+            var ORIGINS = {
+                diamondHill: {
+                    stopId: "001695",
+                    routes: ["E22", "E22X", "E22A", "E22P", "E22C"]
+                },
+                wongTaiSin: {
+                    stopId: "001690",
+                    routes: ["E22", "E22X", "E22A", "E22P", "E22C"]
+                }
+            };
             var I18N = {
                 "zh-HK": {
                     htmlLang: "zh-HK",
-                    documentTitle: "九龍灣 → 航天城 · 巴士到站時間",
+                    documentTitleDh: "鑽石山 → 國泰城 · 巴士到站時間",
+                    documentTitleWts: "黃大仙 → 國泰城 · 巴士到站時間",
                     kicker: "城巴實時到站",
-                    titleShort: "九龍灣 → 航天城",
-                    titleLong: "九龍灣站 → 航天城",
+                    titleShortDh: "鑽石山 → 國泰城",
+                    titleLongDh: "鑽石山站 → 國泰城",
+                    titleShortWts: "黃大仙 → 國泰城",
+                    titleLongWts: "黃大仙 → 國泰城",
+                    originDh: "鑽石山",
+                    originDhHint: "龍翔道 · 鑽石山站",
+                    originWts: "黃大仙",
+                    originWtsHint: "龍翔道 · 沙田坳道",
                     board: "上車",
-                    boardStop: "九龍灣站",
-                    boardHint: "觀塘道 · 往機場／航天城方向",
+                    boardStopDh: "鑽石山站",
+                    boardHintDh: "龍翔道 · 往機場／航天城方向",
+                    boardStopWts: "沙田坳道",
+                    boardHintWts: "龍翔道 · 黃大仙 · 往機場／航天城方向",
                     alight: "下車",
-                    alightStop: "航天城",
+                    alightStop: "國泰城",
                     alightHint: "觀景路",
-                    allDay: "全日",
-                    peak: "繁忙時間",
-                    cityflyer: "機場快線",
                     routesAria: "途經此行程的路線",
+                    originAria: "上車地點",
                     refreshAria: "重新整理",
                     langGroup: "語言",
                     loading: "正在載入到站時間…",
@@ -442,40 +484,44 @@
                     apiDown: "未能連接資料",
                     failed: "載入失敗",
                     updated: "已更新",
-                    stopHint: "觀塘道車站",
                     lastAttempt: "上次嘗試",
                     fetchFail: "未能連接城巴開放數據，請檢查網絡後再重新整理。",
-                    empty: "現時沒有即將到站的班次。E22X 只於平日繁忙時間行走，屬正常情況。",
+                    empty: "現時沒有即將到站的班次。部分路線只於平日繁忙時間行走。",
                     next: "下一班",
                     following: "其後",
                     due: "即將到站",
                     now: "現在",
-                    min: "分鐘",
                     destPrefix: "往",
                     corridorTitle: "本走廊路線說明",
-                    noteE22: "E22 — 藍田（北）往航天城。途經九龍灣站及航天城，全日服務。",
-                    noteE22X: "E22X — 油塘往航天城。同樣途經上述兩站，只於平日繁忙時間服務。",
-                    noteA22: "A22 — 藍田站往機場。官方站位包括航天城；城巴註明部分早上班次繞經航天城，其他班次或直達客運大樓。",
-                    noteSkip: "未列出：A29／NA29 停九龍灣站但不經航天城（往一號客運大樓）。E22A／E22C／E22P 停航天城但不經九龍灣站（E22P 最近為坪石邨）。",
+                    noteRoutes: "此兩站往國泰城的城巴：E22（全日）、E22A（將軍澳）、E22C／E22P／E22X（繁忙時間為主）。",
+                    noteStops: "鑽石山站編號 001695；黃大仙上車點為龍翔道近沙田坳道（001690），往機場／航天城方向。下車：國泰城，觀景路。",
+                    noteSkip: "A22／A29 不停鑽石山站或沙田坳道往國泰城。E23／E23A 行慈雲山及紅磡走廊，不經此兩站。",
                     footerBefore: "資料來源：",
                     footerAfter: "城巴開放數據。到站時間僅供參考。"
                 },
                 en: {
                     htmlLang: "en",
-                    documentTitle: "Kowloon Bay → Cathay Pacific City · Bus ETA",
+                    documentTitleDh: "Diamond Hill → Cathay Pacific City · Bus ETA",
+                    documentTitleWts: "Wong Tai Sin → Cathay Pacific City · Bus ETA",
                     kicker: "Citybus live ETA",
-                    titleShort: "Kowloon Bay → Cathay City",
-                    titleLong: "Kowloon Bay Station → Cathay Pacific City",
+                    titleShortDh: "Diamond Hill → Cathay City",
+                    titleLongDh: "Diamond Hill Station → Cathay Pacific City",
+                    titleShortWts: "Wong Tai Sin → Cathay City",
+                    titleLongWts: "Wong Tai Sin → Cathay Pacific City",
+                    originDh: "Diamond Hill",
+                    originDhHint: "Lung Cheung Rd · station",
+                    originWts: "Wong Tai Sin",
+                    originWtsHint: "Lung Cheung Rd · Shatin Pass Rd",
                     board: "Board",
-                    boardStop: "Kowloon Bay Station",
-                    boardHint: "Kwun Tong Road · towards Airport / SKYCITY",
+                    boardStopDh: "Diamond Hill Station",
+                    boardHintDh: "Lung Cheung Road · towards Airport / SKYCITY",
+                    boardStopWts: "Shatin Pass Road",
+                    boardHintWts: "Lung Cheung Road · Wong Tai Sin · towards Airport / SKYCITY",
                     alight: "Alight",
                     alightStop: "Cathay Pacific City",
                     alightHint: "Scenic Road",
-                    allDay: "All day",
-                    peak: "Peak",
-                    cityflyer: "Cityflyer",
                     routesAria: "Routes that serve this journey",
+                    originAria: "Boarding stop",
                     refreshAria: "Refresh bus arrivals",
                     langGroup: "Language",
                     loading: "Fetching upcoming arrivals…",
@@ -486,21 +532,18 @@
                     apiDown: "API unavailable",
                     failed: "Failed",
                     updated: "Updated",
-                    stopHint: "Kwun Tong Road stop",
                     lastAttempt: "Last attempt",
                     fetchFail: "Could not reach the Citybus API. Check your network and tap refresh.",
-                    empty: "No upcoming arrivals. E22X only runs at weekday peak hours.",
+                    empty: "No upcoming arrivals. Some routes only run at weekday peak hours.",
                     next: "Next bus",
                     following: "Following",
                     due: "Due",
                     now: "now",
-                    min: "min",
                     destPrefix: "To",
                     corridorTitle: "Routes on this corridor",
-                    noteE22: "E22 — Lam Tin (North) → SKYCITY. Stops at Kowloon Bay Station then Cathay Pacific City. Main all-day service.",
-                    noteE22X: "E22X — Yau Tong → SKYCITY. Same two stops. Weekday peak only; empty ETA is normal outside service hours.",
-                    noteA22: "A22 — Lam Tin Station → Airport. Official stop list includes Cathay Pacific City. Some morning trips divert via Cathay City; others may go to the passenger terminal only.",
-                    noteSkip: "Not shown: A29 / NA29 stop at Kowloon Bay Station but skip Cathay Pacific City (Airport Terminal 1). E22A / E22C / E22P serve Cathay Pacific City but skip Kowloon Bay Station (E22P nearest is Ping Shek Estate).",
+                    noteRoutes: "Citybus to Cathay Pacific City from these stops: E22 (all day), E22A (Tseung Kwan O), E22C / E22P / E22X (mainly peak hours).",
+                    noteStops: "Diamond Hill Station is stop 001695. Wong Tai Sin boarding is Lung Cheung Road near Shatin Pass Road (001690), airport-bound. Alight at Cathay Pacific City, Scenic Road.",
+                    noteSkip: "A22 / A29 do not serve Diamond Hill or Shatin Pass Road towards Cathay City. E23 / E23A use the Tsz Wan Shan / Hung Hom corridor instead.",
                     footerBefore: "Data from ",
                     footerAfter: " Citybus Open API. Times are estimates only."
                 }
@@ -515,16 +558,26 @@
             var langZh = document.getElementById("lang-zh");
             var langEn = document.getElementById("lang-en");
             var langGroup = document.querySelector(".lang");
+            var originGroup = document.querySelector(".origin");
+            var originDh = document.getElementById("origin-dh");
+            var originWts = document.getElementById("origin-wts");
+            var routeChips = document.getElementById("route-chips");
 
             var inflight = null;
             var lastResults = null;
             var lastUpdatedAt = null;
             var lang = "zh-HK";
-            var timer = null;
+            var originKey = "diamondHill";
+            var refreshTimer = null;
+            var tickTimer = null;
 
             function t(key) {
                 var pack = I18N[lang] || I18N["zh-HK"];
                 return pack[key] || key;
+            }
+
+            function currentOrigin() {
+                return ORIGINS[originKey] || ORIGINS.diamondHill;
             }
 
             function detectLang() {
@@ -535,10 +588,77 @@
                 return "zh-HK";
             }
 
+            function detectOrigin() {
+                try {
+                    var saved = localStorage.getItem(ORIGIN_KEY);
+                    if (saved && ORIGINS[saved]) return saved;
+                } catch (e) { /* ignore */ }
+                return "diamondHill";
+            }
+
+            function pad2(n) {
+                return n < 10 ? "0" + n : String(n);
+            }
+
+            function secondsUntil(iso) {
+                if (!iso) return null;
+                var eta = new Date(iso);
+                if (isNaN(eta.getTime())) return null;
+                return Math.round((eta.getTime() - Date.now()) / 1000);
+            }
+
+            function countdownParts(iso) {
+                var sec = secondsUntil(iso);
+                if (sec === null) return { label: "—", unit: "", tone: "tone-na", sec: null };
+                if (sec <= 0) return { label: t("due"), unit: t("now"), tone: "tone-due", sec: sec };
+                var m = Math.floor(sec / 60);
+                var s = sec % 60;
+                return {
+                    label: m + ":" + pad2(s),
+                    unit: "",
+                    tone: sec <= 60 ? "tone-due" : (sec <= 480 ? "tone-soon" : "tone-later"),
+                    sec: sec
+                };
+            }
+
+            function formatClock(iso) {
+                var eta = iso instanceof Date ? iso : new Date(iso);
+                if (isNaN(eta.getTime())) return "";
+                return eta.toLocaleTimeString(lang === "en" ? "en-HK" : "zh-HK", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: lang === "en"
+                });
+            }
+
+            function applyOriginUi() {
+                var isDh = originKey === "diamondHill";
+                originDh.className = isDh ? "is-on" : "";
+                originWts.className = isDh ? "" : "is-on";
+                originDh.setAttribute("aria-pressed", isDh ? "true" : "false");
+                originWts.setAttribute("aria-pressed", isDh ? "true" : "false");
+                document.getElementById("title-short").textContent = t(isDh ? "titleShortDh" : "titleShortWts");
+                document.getElementById("title-long").textContent = t(isDh ? "titleLongDh" : "titleLongWts");
+                document.title = t(isDh ? "documentTitleDh" : "documentTitleWts");
+                document.getElementById("board-stop-m").textContent = t(isDh ? "boardStopDh" : "boardStopWts");
+                document.getElementById("board-hint-m").textContent = t(isDh ? "boardHintDh" : "boardHintWts");
+                document.getElementById("board-stop-d").textContent = t(isDh ? "boardStopDh" : "boardStopWts");
+                document.getElementById("board-hint-d").textContent = t(isDh ? "boardHintDh" : "boardHintWts");
+                writeUpdatedTime(lastUpdatedAt);
+                renderRouteChips();
+            }
+
+            function renderRouteChips() {
+                var routes = currentOrigin().routes;
+                routeChips.innerHTML = routes.map(function (route) {
+                    return '<div class="card"><p class="name">' + escapeHtml(route) + "</p></div>";
+                }).join("");
+            }
+
             function applyLang() {
                 var pack = I18N[lang];
                 document.documentElement.lang = pack.htmlLang;
-                document.title = pack.documentTitle;
                 document.querySelectorAll("[data-i18n]").forEach(function (el) {
                     el.textContent = t(el.getAttribute("data-i18n"));
                 });
@@ -546,11 +666,12 @@
                     el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria")));
                 });
                 if (langGroup) langGroup.setAttribute("aria-label", t("langGroup"));
+                if (originGroup) originGroup.setAttribute("aria-label", t("originAria"));
                 langZh.className = lang === "zh-HK" ? "is-on" : "";
                 langEn.className = lang === "en" ? "is-on" : "";
                 langZh.setAttribute("aria-pressed", lang === "zh-HK" ? "true" : "false");
                 langEn.setAttribute("aria-pressed", lang === "en" ? "true" : "false");
-                writeUpdatedTime(lastUpdatedAt);
+                applyOriginUi();
                 if (lastResults) renderResults(lastResults);
             }
 
@@ -559,13 +680,22 @@
                     timeSpan.textContent = t("loading");
                     return;
                 }
-                timeSpan.textContent = t("updated") + " " + formatClock(when.toISOString()) + " · " + t("stopHint");
+                timeSpan.textContent = t("updated") + " " + formatClock(when.toISOString());
             }
 
             function setLang(next) {
                 lang = next;
                 try { localStorage.setItem(LANG_KEY, lang); } catch (e) { /* ignore */ }
                 applyLang();
+            }
+
+            function setOrigin(next) {
+                if (!ORIGINS[next] || next === originKey) return;
+                originKey = next;
+                try { localStorage.setItem(ORIGIN_KEY, originKey); } catch (e) { /* ignore */ }
+                lastResults = null;
+                applyOriginUi();
+                fetchBusData();
             }
 
             function escapeHtml(value) {
@@ -577,40 +707,8 @@
                     .replace(/'/g, "&#39;");
             }
 
-            function minutesUntil(iso) {
-                if (!iso) return null;
-                var eta = new Date(iso);
-                if (isNaN(eta.getTime())) return null;
-                return Math.round((eta.getTime() - Date.now()) / 60000);
-            }
-
-            function formatClock(iso) {
-                var eta = iso instanceof Date ? iso : new Date(iso);
-                if (isNaN(eta.getTime())) return "";
-                return eta.toLocaleTimeString(lang === "en" ? "en-HK" : "zh-HK", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: lang === "en"
-                });
-            }
-
-            function etaLabel(mins) {
-                if (mins === null) return "—";
-                if (mins <= 0) return t("due");
-                return String(mins);
-            }
-
-            function etaUnit(mins) {
-                if (mins === null) return "";
-                if (mins <= 0) return t("now");
-                return t("min");
-            }
-
-            function etaTone(mins) {
-                if (mins === null) return "tone-na";
-                if (mins <= 1) return "tone-due";
-                if (mins <= 8) return "tone-soon";
-                return "tone-later";
+            function destLine(dest) {
+                return lang === "en" ? t("destPrefix") + " " + dest : t("destPrefix") + dest;
             }
 
             function setStatus(kind, extra) {
@@ -644,16 +742,12 @@
                 });
             }
 
-            function destLine(dest) {
-                return lang === "en" ? t("destPrefix") + " " + dest : t("destPrefix") + dest;
-            }
-
             function arrivalCard(item, isNext) {
-                var mins = minutesUntil(item.eta);
+                var parts = countdownParts(item.eta);
                 var remark = lang === "en" ? (item.rmk_en || item.rmk_tc || "") : (item.rmk_tc || item.rmk_en || "");
                 var dest = lang === "en" ? (item.dest_en || item.dest_tc || "") : (item.dest_tc || item.dest_en || "");
                 return (
-                    '<article class="eta-card' + (isNext ? " is-next" : "") + '">' +
+                    '<article class="eta-card' + (isNext ? " is-next" : "") + '" data-eta="' + escapeHtml(item.eta) + '">' +
                         '<div class="badge">' + escapeHtml(item.route) + "</div>" +
                         '<div class="eta-body">' +
                             '<p class="dest">' + escapeHtml(destLine(dest)) + "</p>" +
@@ -661,13 +755,35 @@
                         "</div>" +
                         '<div class="eta-time">' +
                             '<div class="mins">' +
-                                '<b class="' + etaTone(mins) + '">' + escapeHtml(etaLabel(mins)) + "</b>" +
-                                "<span>" + escapeHtml(etaUnit(mins)) + "</span>" +
+                                '<b class="' + parts.tone + '">' + escapeHtml(parts.label) + "</b>" +
+                                (parts.unit ? "<span>" + escapeHtml(parts.unit) + "</span>" : "") +
                             "</div>" +
                             (item.eta ? '<p class="clock">' + escapeHtml(formatClock(item.eta)) + "</p>" : "") +
                         "</div>" +
                     "</article>"
                 );
+            }
+
+            function tickCountdowns() {
+                var cards = container.querySelectorAll(".eta-card[data-eta]");
+                cards.forEach(function (card) {
+                    var parts = countdownParts(card.getAttribute("data-eta"));
+                    var b = card.querySelector(".mins b");
+                    var span = card.querySelector(".mins span");
+                    if (b) {
+                        b.textContent = parts.label;
+                        b.className = parts.tone;
+                    }
+                    if (span) {
+                        if (parts.unit) {
+                            span.textContent = parts.unit;
+                            span.hidden = false;
+                        } else {
+                            span.textContent = "";
+                            span.hidden = true;
+                        }
+                    }
+                });
             }
 
             function flattenArrivals(results) {
@@ -684,9 +800,10 @@
             }
 
             function renderResults(results) {
+                var routes = currentOrigin().routes;
                 var failed = results.filter(function (r) { return r.error; });
                 var arrivals = flattenArrivals(results);
-                if (failed.length === ROUTES.length && !arrivals.length) {
+                if (failed.length === routes.length && !arrivals.length) {
                     container.innerHTML = '<div class="banner error">' + escapeHtml(t("fetchFail")) + "</div>";
                     setStatus("apiDown");
                     return;
@@ -702,8 +819,8 @@
                 setStatus("live", arrivals.length);
             }
 
-            function fetchRouteEta(route, signal) {
-                var url = API_BASE + "/eta/" + COMPANY + "/" + BOARD_STOP_ID + "/" + encodeURIComponent(route);
+            function fetchRouteEta(route, stopId, signal) {
+                var url = API_BASE + "/eta/" + COMPANY + "/" + stopId + "/" + encodeURIComponent(route);
                 return fetchJson(url, signal).then(function (payload) {
                     var rows = payload && Array.isArray(payload.data) ? payload.data : [];
                     return {
@@ -726,11 +843,12 @@
                 if (inflight) inflight.abort();
                 inflight = new AbortController();
                 var signal = inflight.signal;
+                var origin = currentOrigin();
                 refreshBtn.disabled = true;
                 refreshIcon.classList.add("spin");
                 setStatus("updating");
-                Promise.all(ROUTES.map(function (route) {
-                    return fetchRouteEta(route, signal);
+                Promise.all(origin.routes.map(function (route) {
+                    return fetchRouteEta(route, origin.stopId, signal);
                 })).then(function (results) {
                     if (signal.aborted) return;
                     lastResults = results;
@@ -751,18 +869,23 @@
 
             langZh.addEventListener("click", function () { setLang("zh-HK"); });
             langEn.addEventListener("click", function () { setLang("en"); });
+            originDh.addEventListener("click", function () { setOrigin("diamondHill"); });
+            originWts.addEventListener("click", function () { setOrigin("wongTaiSin"); });
             refreshBtn.addEventListener("click", fetchBusData);
             document.addEventListener("visibilitychange", function () {
                 if (!document.hidden) fetchBusData();
             });
 
             lang = detectLang();
+            originKey = detectOrigin();
             applyLang();
             fetchBusData();
-            timer = setInterval(fetchBusData, REFRESH_MS);
+            refreshTimer = setInterval(fetchBusData, REFRESH_MS);
+            tickTimer = setInterval(tickCountdowns, 1000);
             window.addEventListener("pagehide", function () {
                 if (inflight) inflight.abort();
-                if (timer) clearInterval(timer);
+                if (refreshTimer) clearInterval(refreshTimer);
+                if (tickTimer) clearInterval(tickTimer);
             });
         })();
     </script>
