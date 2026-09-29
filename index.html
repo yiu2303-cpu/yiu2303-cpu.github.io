@@ -6,12 +6,12 @@
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#B3EBF2">
     <meta name="referrer" content="no-referrer">
-    <meta name="description" content="鑽石山或黃大仙往國泰城實時巴士到站時間（城巴 E22、E22X、E22A、E22P、E22C），資料來自 DATA.GOV.HK。">
-    <meta property="og:title" content="鑽石山／黃大仙 → 國泰城 · 巴士到站時間">
-    <meta property="og:description" content="城巴實時到站：鑽石山站或黃大仙（龍翔道）往國泰城">
+    <meta name="description" content="九龍灣、鑽石山或黃大仙往國泰城／機場實時巴士到站時間，資料來自 DATA.GOV.HK。">
+    <meta property="og:title" content="九龍灣／鑽石山／黃大仙 → 國泰城 · 巴士到站時間">
+    <meta property="og:description" content="城巴實時到站：九龍灣站、鑽石山站或黃大仙往國泰城／機場">
     <meta property="og:type" content="website">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>鑽石山／黃大仙 → 國泰城 · 巴士到站時間</title>
+    <title>九龍灣／鑽石山／黃大仙 → 國泰城 · 巴士到站時間</title>
     <style>
         :root {
             --theme: #B3EBF2;
@@ -123,7 +123,7 @@
         main { padding: 0.75rem 0 1.5rem; }
         .origin {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 0.5rem;
             margin-bottom: 0.75rem;
         }
@@ -144,9 +144,10 @@
         .origin button small {
             display: block;
             margin-top: 0.15rem;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--muted);
+            line-height: 1.25;
         }
         .hero {
             display: grid;
@@ -366,6 +367,10 @@
     <main class="shell">
         <noscript>此頁需要 JavaScript 才能顯示實時到站時間。This page needs JavaScript for live bus ETAs.</noscript>
         <div class="origin" role="group" aria-label="上車地點">
+            <button type="button" id="origin-kb" data-origin="kowloonBay">
+                <span data-i18n="originKb">九龍灣</span>
+                <small data-i18n="originKbHint">觀塘道 · 九龍灣站</small>
+            </button>
             <button type="button" id="origin-dh" data-origin="diamondHill">
                 <span data-i18n="originDh">鑽石山</span>
                 <small data-i18n="originDhHint">龍翔道 · 鑽石山站</small>
@@ -441,30 +446,44 @@
             var LANG_KEY = "bus-eta-lang";
             var ORIGIN_KEY = "bus-eta-origin";
             var ORIGINS = {
+                kowloonBay: {
+                    stopId: "001500",
+                    suffix: "Kb",
+                    routes: ["E22", "E22X", "A22"]
+                },
                 diamondHill: {
                     stopId: "001695",
+                    suffix: "Dh",
                     routes: ["E22", "E22X", "E22A", "E22P", "E22C"]
                 },
                 wongTaiSin: {
                     stopId: "001690",
+                    suffix: "Wts",
                     routes: ["E22", "E22X", "E22A", "E22P", "E22C"]
                 }
             };
             var I18N = {
                 "zh-HK": {
                     htmlLang: "zh-HK",
+                    documentTitleKb: "九龍灣 → 國泰城 · 巴士到站時間",
                     documentTitleDh: "鑽石山 → 國泰城 · 巴士到站時間",
                     documentTitleWts: "黃大仙 → 國泰城 · 巴士到站時間",
                     kicker: "城巴實時到站",
+                    titleShortKb: "九龍灣 → 國泰城",
+                    titleLongKb: "九龍灣站 → 國泰城",
                     titleShortDh: "鑽石山 → 國泰城",
                     titleLongDh: "鑽石山站 → 國泰城",
                     titleShortWts: "黃大仙 → 國泰城",
                     titleLongWts: "黃大仙 → 國泰城",
+                    originKb: "九龍灣",
+                    originKbHint: "觀塘道 · 九龍灣站",
                     originDh: "鑽石山",
                     originDhHint: "龍翔道 · 鑽石山站",
                     originWts: "黃大仙",
                     originWtsHint: "龍翔道 · 沙田坳道",
                     board: "上車",
+                    boardStopKb: "九龍灣站",
+                    boardHintKb: "觀塘道 · 往機場／航天城方向",
                     boardStopDh: "鑽石山站",
                     boardHintDh: "龍翔道 · 往機場／航天城方向",
                     boardStopWts: "沙田坳道",
@@ -493,26 +512,33 @@
                     now: "現在",
                     destPrefix: "往",
                     corridorTitle: "本走廊路線說明",
-                    noteRoutes: "此兩站往國泰城的城巴：E22（全日）、E22A（將軍澳）、E22C／E22P／E22X（繁忙時間為主）。",
-                    noteStops: "鑽石山站編號 001695；黃大仙上車點為龍翔道近沙田坳道（001690），往機場／航天城方向。下車：國泰城，觀景路。",
-                    noteSkip: "A22／A29 不停鑽石山站或沙田坳道往國泰城。E23／E23A 行慈雲山及紅磡走廊，不經此兩站。",
+                    noteRoutes: "九龍灣站：E22（全日）、E22X（繁忙時間）、A22（機場快線，部分班次經國泰城）。鑽石山／黃大仙：E22、E22A、E22C、E22P、E22X。",
+                    noteStops: "九龍灣站 001500（觀塘道）；鑽石山站 001695；黃大仙為龍翔道近沙田坳道 001690。均選往機場／航天城方向。下車：國泰城，觀景路。",
+                    noteSkip: "E22A／E22C／E22P 不停九龍灣站。A22／A29 不停鑽石山或沙田坳道。E23／E23A 行慈雲山及紅磡走廊。",
                     footerBefore: "資料來源：",
                     footerAfter: "城巴開放數據。到站時間僅供參考。"
                 },
                 en: {
                     htmlLang: "en",
+                    documentTitleKb: "Kowloon Bay → Cathay Pacific City · Bus ETA",
                     documentTitleDh: "Diamond Hill → Cathay Pacific City · Bus ETA",
                     documentTitleWts: "Wong Tai Sin → Cathay Pacific City · Bus ETA",
                     kicker: "Citybus live ETA",
+                    titleShortKb: "Kowloon Bay → Cathay City",
+                    titleLongKb: "Kowloon Bay Station → Cathay Pacific City",
                     titleShortDh: "Diamond Hill → Cathay City",
                     titleLongDh: "Diamond Hill Station → Cathay Pacific City",
                     titleShortWts: "Wong Tai Sin → Cathay City",
                     titleLongWts: "Wong Tai Sin → Cathay Pacific City",
+                    originKb: "Kowloon Bay",
+                    originKbHint: "Kwun Tong Rd · station",
                     originDh: "Diamond Hill",
                     originDhHint: "Lung Cheung Rd · station",
                     originWts: "Wong Tai Sin",
                     originWtsHint: "Lung Cheung Rd · Shatin Pass Rd",
                     board: "Board",
+                    boardStopKb: "Kowloon Bay Station",
+                    boardHintKb: "Kwun Tong Road · towards Airport / SKYCITY",
                     boardStopDh: "Diamond Hill Station",
                     boardHintDh: "Lung Cheung Road · towards Airport / SKYCITY",
                     boardStopWts: "Shatin Pass Road",
@@ -541,9 +567,9 @@
                     now: "now",
                     destPrefix: "To",
                     corridorTitle: "Routes on this corridor",
-                    noteRoutes: "Citybus to Cathay Pacific City from these stops: E22 (all day), E22A (Tseung Kwan O), E22C / E22P / E22X (mainly peak hours).",
-                    noteStops: "Diamond Hill Station is stop 001695. Wong Tai Sin boarding is Lung Cheung Road near Shatin Pass Road (001690), airport-bound. Alight at Cathay Pacific City, Scenic Road.",
-                    noteSkip: "A22 / A29 do not serve Diamond Hill or Shatin Pass Road towards Cathay City. E23 / E23A use the Tsz Wan Shan / Hung Hom corridor instead.",
+                    noteRoutes: "Kowloon Bay Station: E22 (all day), E22X (peak), A22 (Cityflyer; some trips via Cathay City). Diamond Hill / Wong Tai Sin: E22, E22A, E22C, E22P, E22X.",
+                    noteStops: "Kowloon Bay Station is 001500 (Kwun Tong Road). Diamond Hill Station is 001695. Wong Tai Sin boarding is Lung Cheung Road near Shatin Pass Road (001690), airport-bound. Alight at Cathay Pacific City, Scenic Road.",
+                    noteSkip: "E22A / E22C / E22P skip Kowloon Bay Station. A22 / A29 skip Diamond Hill and Shatin Pass Road. E23 / E23A use the Tsz Wan Shan / Hung Hom corridor.",
                     footerBefore: "Data from ",
                     footerAfter: " Citybus Open API. Times are estimates only."
                 }
@@ -559,6 +585,7 @@
             var langEn = document.getElementById("lang-en");
             var langGroup = document.querySelector(".lang");
             var originGroup = document.querySelector(".origin");
+            var originKb = document.getElementById("origin-kb");
             var originDh = document.getElementById("origin-dh");
             var originWts = document.getElementById("origin-wts");
             var routeChips = document.getElementById("route-chips");
@@ -567,7 +594,7 @@
             var lastResults = null;
             var lastUpdatedAt = null;
             var lang = "zh-HK";
-            var originKey = "diamondHill";
+            var originKey = "kowloonBay";
             var refreshTimer = null;
             var tickTimer = null;
 
@@ -577,7 +604,7 @@
             }
 
             function currentOrigin() {
-                return ORIGINS[originKey] || ORIGINS.diamondHill;
+                return ORIGINS[originKey] || ORIGINS.kowloonBay;
             }
 
             function detectLang() {
@@ -593,7 +620,7 @@
                     var saved = localStorage.getItem(ORIGIN_KEY);
                     if (saved && ORIGINS[saved]) return saved;
                 } catch (e) { /* ignore */ }
-                return "diamondHill";
+                return "kowloonBay";
             }
 
             function pad2(n) {
@@ -633,18 +660,21 @@
             }
 
             function applyOriginUi() {
-                var isDh = originKey === "diamondHill";
-                originDh.className = isDh ? "is-on" : "";
-                originWts.className = isDh ? "" : "is-on";
-                originDh.setAttribute("aria-pressed", isDh ? "true" : "false");
-                originWts.setAttribute("aria-pressed", isDh ? "true" : "false");
-                document.getElementById("title-short").textContent = t(isDh ? "titleShortDh" : "titleShortWts");
-                document.getElementById("title-long").textContent = t(isDh ? "titleLongDh" : "titleLongWts");
-                document.title = t(isDh ? "documentTitleDh" : "documentTitleWts");
-                document.getElementById("board-stop-m").textContent = t(isDh ? "boardStopDh" : "boardStopWts");
-                document.getElementById("board-hint-m").textContent = t(isDh ? "boardHintDh" : "boardHintWts");
-                document.getElementById("board-stop-d").textContent = t(isDh ? "boardStopDh" : "boardStopWts");
-                document.getElementById("board-hint-d").textContent = t(isDh ? "boardHintDh" : "boardHintWts");
+                var origin = currentOrigin();
+                var suffix = origin.suffix;
+                originKb.className = originKey === "kowloonBay" ? "is-on" : "";
+                originDh.className = originKey === "diamondHill" ? "is-on" : "";
+                originWts.className = originKey === "wongTaiSin" ? "is-on" : "";
+                originKb.setAttribute("aria-pressed", originKey === "kowloonBay" ? "true" : "false");
+                originDh.setAttribute("aria-pressed", originKey === "diamondHill" ? "true" : "false");
+                originWts.setAttribute("aria-pressed", originKey === "wongTaiSin" ? "true" : "false");
+                document.getElementById("title-short").textContent = t("titleShort" + suffix);
+                document.getElementById("title-long").textContent = t("titleLong" + suffix);
+                document.title = t("documentTitle" + suffix);
+                document.getElementById("board-stop-m").textContent = t("boardStop" + suffix);
+                document.getElementById("board-hint-m").textContent = t("boardHint" + suffix);
+                document.getElementById("board-stop-d").textContent = t("boardStop" + suffix);
+                document.getElementById("board-hint-d").textContent = t("boardHint" + suffix);
                 writeUpdatedTime(lastUpdatedAt);
                 renderRouteChips();
             }
@@ -869,6 +899,7 @@
 
             langZh.addEventListener("click", function () { setLang("zh-HK"); });
             langEn.addEventListener("click", function () { setLang("en"); });
+            originKb.addEventListener("click", function () { setOrigin("kowloonBay"); });
             originDh.addEventListener("click", function () { setOrigin("diamondHill"); });
             originWts.addEventListener("click", function () { setOrigin("wongTaiSin"); });
             refreshBtn.addEventListener("click", fetchBusData);
