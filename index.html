@@ -3,18 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#1d4ed8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="九龍灣站往航天城實時巴士到站時間（城巴 E22、E22X、A22），資料來自 DATA.GOV.HK。">
+    <meta property="og:title" content="九龍灣 → 航天城 · 巴士到站時間">
+    <meta property="og:description" content="城巴實時到站：九龍灣站往航天城（E22 / E22X / A22）">
+    <meta property="og:type" content="website">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>九龍灣 → 航天城 · 巴士到站時間</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
+            --blue: #2563eb;
+            --blue-dark: #1d4ed8;
+            --ink: #1e293b;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --bg: #f1f5f9;
+            --card: #fff;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; }
         body {
+            min-height: 100dvh;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang HK", "Noto Sans TC", sans-serif;
+            background: var(--bg);
+            color: var(--ink);
             padding-bottom: calc(var(--safe-bottom) + 1rem);
+            -webkit-font-smoothing: antialiased;
         }
+        a { color: var(--blue); }
+        button { font: inherit; cursor: pointer; }
         .shell {
             width: min(72rem, calc(100% - 1.5rem));
             margin-inline: auto;
@@ -22,128 +43,379 @@
         @media (min-width: 640px) {
             .shell { width: min(72rem, calc(100% - 3rem)); }
         }
+        header.top {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: var(--blue);
+            color: #fff;
+            padding-top: var(--safe-top);
+            border-bottom: 1px solid rgb(29 78 216 / 0.25);
+        }
+        .top-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 0;
+        }
+        .kicker {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #dbeafe;
+        }
+        h1 { margin: 0.15rem 0 0; font-size: 1rem; line-height: 1.3; }
+        .title-long { display: none; }
+        .grow { min-width: 0; flex: 1; }
+        .actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+        #live-status {
+            display: none;
+            border-radius: 999px;
+            background: rgb(255 255 255 / 0.15);
+            padding: 0.25rem 0.65rem;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .lang {
+            display: flex;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgb(255 255 255 / 0.15);
+            padding: 2px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .lang button {
+            border: 0;
+            background: transparent;
+            color: rgb(255 255 255 / 0.85);
+            border-radius: 999px;
+            padding: 0.4rem 0.65rem;
+            min-height: 44px;
+        }
+        .lang button.is-on {
+            background: #fff;
+            color: var(--blue-dark);
+        }
+        #refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 999px;
+            background: #fff;
+            color: var(--blue-dark);
+        }
+        #refresh-btn:disabled { opacity: 0.6; }
+        #refresh-icon.spin { animation: spin 0.8s linear infinite; }
+        #update-time {
+            margin: 0;
+            padding-bottom: 0.75rem;
+            font-size: 11px;
+            color: #dbeafe;
+        }
+        main { padding: 0.75rem 0 1.5rem; }
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 1rem;
+            box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+            border: 1px solid rgb(226 232 240 / 0.9);
+        }
+        .journey-m {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0 0.75rem;
+            padding: 0.75rem 1rem;
+        }
+        .rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 0.25rem;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 999px; }
+        .dot-a { background: var(--blue); }
+        .dot-b { background: #38bdf8; }
+        .rail-line { width: 1px; flex: 1; margin: 0.25rem 0; background: var(--line); }
+        .lbl {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+        .name { margin: 0.1rem 0 0; font-size: 0.9rem; font-weight: 700; }
+        .hint { margin: 0.15rem 0 0; font-size: 12px; color: var(--muted); }
+        .stack > div + div { margin-top: 0.75rem; }
+        .journey-d { display: none; }
+        .arrow { font-size: 1.5rem; font-weight: 300; color: #cbd5e1; padding: 0 0.5rem; }
+        .pad { padding: 1rem 1.25rem; }
+        .routes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        .routes .card { text-align: center; padding: 0.65rem 0.5rem; }
+        .routes .name { font-size: 1.125rem; }
+        #mobile-status { margin: 0.5rem 0 0; font-size: 12px; font-weight: 600; color: #047857; }
+        #eta-container {
+            margin-top: 0.75rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        .eta-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            border: 1px solid rgb(226 232 240 / 0.9);
+            box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+        }
+        .eta-card.is-next {
+            background: #eff6ff;
+            border: 2px solid var(--blue);
+        }
+        .badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 3.75rem;
+            height: 3rem;
+            padding: 0 0.5rem;
+            border-radius: 0.75rem;
+            background: var(--blue);
+            color: #fff;
+            font-size: 1.125rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .eta-body { min-width: 0; flex: 1; }
+        .eta-body p { margin: 0; }
+        .dest { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub { margin-top: 0.15rem; font-size: 11px; color: var(--muted); }
+        .eta-time { text-align: right; flex-shrink: 0; }
+        .mins {
+            display: flex;
+            align-items: baseline;
+            justify-content: flex-end;
+            gap: 0.25rem;
+        }
+        .mins b {
+            font-size: 1.65rem;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+        .mins span { font-size: 11px; font-weight: 700; color: #94a3b8; }
+        .clock { margin: 0.15rem 0 0; font-size: 10px; color: #94a3b8; font-variant-numeric: tabular-nums; }
+        .tone-due { color: #059669; }
+        .tone-soon { color: var(--blue); }
+        .tone-later { color: var(--ink); }
+        .tone-na { color: #94a3b8; }
+        .banner {
+            grid-column: 1 / -1;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .banner.loading { background: #fff; color: #94a3b8; }
+        .banner.error { background: #fef2f2; color: #b91c1c; }
+        .banner.empty { background: #fffbeb; color: #92400e; }
+        details.notes {
+            margin-top: 1rem;
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid rgb(226 232 240 / 0.9);
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        details.notes summary {
+            min-height: 44px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--ink);
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+        details.notes summary::-webkit-details-marker { display: none; }
+        details.notes ul { margin: 0.75rem 0 0; padding-left: 1.25rem; }
+        details.notes li + li { margin-top: 0.5rem; }
+        footer.site {
+            margin-top: 1.25rem;
+            padding-bottom: 1rem;
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #94a3b8;
+        }
+        .status-wait { color: #b45309; }
+        .status-bad { color: #b91c1c; }
+        .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+        noscript { display: block; margin: 1rem; padding: 1rem; background: #fffbeb; color: #92400e; border-radius: 1rem; }
+        @media (min-width: 640px) {
+            .top-row { gap: 0.75rem; padding: 1rem 0; }
+            h1 { font-size: 1.25rem; }
+            .title-short { display: none; }
+            .title-long { display: inline; }
+            #live-status { display: inline; }
+            .lang button { min-height: 0; }
+            #refresh-btn { width: 48px; height: 48px; }
+            #update-time { font-size: 12px; }
+            main { padding: 1.5rem 0; }
+            .journey-m { display: none; }
+            .journey-d {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+            }
+            .name { font-size: 1rem; }
+            .routes .card { padding: 1rem 0.75rem; }
+            .routes .name { font-size: 1.5rem; }
+            #mobile-status { display: none; }
+            #eta-container { margin-top: 1rem; }
+            .eta-card { padding: 1rem; }
+            .mins b { font-size: 1.875rem; }
+        }
+        @media (min-width: 768px) {
+            #eta-container { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 1024px) {
+            .title-long { font-size: 1.5rem; }
+            main { padding: 2rem 0; }
+            .hero { grid-template-columns: 3fr 2fr; gap: 1rem; }
+            #eta-container { grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        }
         @media (prefers-reduced-motion: reduce) {
             * { animation: none !important; transition: none !important; }
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-dvh bg-slate-100 text-slate-800 antialiased">
-    <header class="sticky top-0 z-20 w-full border-b border-blue-700/20 bg-blue-600 text-white" style="padding-top: var(--safe-top);">
-        <div class="shell flex items-center gap-2 py-3 sm:gap-3 sm:py-4">
-            <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue-100" data-i18n="kicker">城巴實時到站</p>
-                <h1 class="mt-0.5 font-bold leading-snug">
-                    <span class="block text-base sm:hidden" data-i18n="titleShort">九龍灣 → 航天城</span>
-                    <span class="hidden text-xl sm:inline lg:text-2xl" data-i18n="titleLong">九龍灣站 → 航天城</span>
+<body>
+    <a class="sr" href="#eta-container">Skip to arrivals</a>
+    <header class="top">
+        <div class="shell top-row">
+            <div class="grow">
+                <p class="kicker" data-i18n="kicker">城巴實時到站</p>
+                <h1>
+                    <span class="title-short" data-i18n="titleShort">九龍灣 → 航天城</span>
+                    <span class="title-long" data-i18n="titleLong">九龍灣站 → 航天城</span>
                 </h1>
             </div>
-            <div class="flex shrink-0 items-center gap-2">
-                <span id="live-status" class="hidden rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-emerald-100 sm:inline"></span>
-                <div class="flex overflow-hidden rounded-full bg-white/15 p-0.5 text-[11px] font-bold" role="group" aria-label="Language">
-                    <button type="button" id="lang-zh" class="rounded-full px-2.5 py-1.5 min-h-11 sm:min-h-0" data-lang="zh-HK">繁</button>
-                    <button type="button" id="lang-en" class="rounded-full px-2.5 py-1.5 min-h-11 sm:min-h-0" data-lang="en">EN</button>
+            <div class="actions">
+                <span id="live-status"></span>
+                <div class="lang" role="group" aria-label="語言">
+                    <button type="button" id="lang-zh" aria-pressed="true">繁</button>
+                    <button type="button" id="lang-en" aria-pressed="false">EN</button>
                 </div>
-                <button
-                    id="refresh-btn"
-                    type="button"
-                    class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-blue-700 shadow-sm active:scale-95 disabled:opacity-60 sm:h-12 sm:w-12"
-                    data-i18n-aria="refreshAria"
-                    aria-label="重新整理"
-                >
-                    <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <button type="button" id="refresh-btn" data-i18n-aria="refreshAria" aria-label="重新整理">
+                    <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                 </button>
             </div>
         </div>
-        <p id="update-time" class="shell pb-3 text-[11px] text-blue-100 sm:text-xs"></p>
+        <p id="update-time" class="shell"></p>
     </header>
 
-    <main class="shell py-3 sm:py-6 lg:py-8">
-        <div class="grid grid-cols-1 gap-3 lg:grid-cols-5 lg:gap-4">
-            <section class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80 lg:col-span-3">
-                <div class="grid grid-cols-[auto_1fr] gap-x-3 px-4 py-3 sm:hidden">
-                    <div class="flex flex-col items-center pt-1">
-                        <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
-                        <span class="my-1 w-px flex-1 bg-slate-200"></span>
-                        <span class="h-2.5 w-2.5 rounded-full bg-sky-400"></span>
+    <main class="shell">
+        <noscript>此頁需要 JavaScript 才能顯示實時到站時間。This page needs JavaScript for live bus ETAs.</noscript>
+        <div class="hero">
+            <section class="card">
+                <div class="journey-m">
+                    <div class="rail">
+                        <span class="dot dot-a"></span>
+                        <span class="rail-line"></span>
+                        <span class="dot dot-b"></span>
                     </div>
-                    <div class="space-y-3">
+                    <div class="stack">
                         <div>
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400" data-i18n="board">上車</p>
-                            <p class="text-sm font-semibold text-slate-900" data-i18n="boardStop">九龍灣站</p>
-                            <p class="text-xs text-slate-500" data-i18n="boardHint">觀塘道 · 往機場／航天城方向</p>
+                            <p class="lbl" data-i18n="board">上車</p>
+                            <p class="name" data-i18n="boardStop">九龍灣站</p>
+                            <p class="hint" data-i18n="boardHint">觀塘道 · 往機場／航天城方向</p>
                         </div>
                         <div>
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400" data-i18n="alight">下車</p>
-                            <p class="text-sm font-semibold text-slate-900" data-i18n="alightStop">航天城</p>
-                            <p class="text-xs text-slate-500" data-i18n="alightHint">觀景路</p>
+                            <p class="lbl" data-i18n="alight">下車</p>
+                            <p class="name" data-i18n="alightStop">航天城</p>
+                            <p class="hint" data-i18n="alightHint">觀景路</p>
                         </div>
                     </div>
                 </div>
-                <div class="hidden sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-                    <div class="px-5 py-4">
-                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400" data-i18n="board">上車</p>
-                        <p class="text-base font-semibold text-slate-900" data-i18n="boardStop">九龍灣站</p>
-                        <p class="text-xs text-slate-500" data-i18n="boardHint">觀塘道 · 往機場／航天城方向</p>
+                <div class="journey-d">
+                    <div class="pad">
+                        <p class="lbl" data-i18n="board">上車</p>
+                        <p class="name" data-i18n="boardStop">九龍灣站</p>
+                        <p class="hint" data-i18n="boardHint">觀塘道 · 往機場／航天城方向</p>
                     </div>
-                    <div class="px-2 text-2xl font-light text-slate-300" aria-hidden="true">→</div>
-                    <div class="px-5 py-4">
-                        <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400" data-i18n="alight">下車</p>
-                        <p class="text-base font-semibold text-slate-900" data-i18n="alightStop">航天城</p>
-                        <p class="text-xs text-slate-500" data-i18n="alightHint">觀景路</p>
+                    <div class="arrow" aria-hidden="true">→</div>
+                    <div class="pad">
+                        <p class="lbl" data-i18n="alight">下車</p>
+                        <p class="name" data-i18n="alightStop">航天城</p>
+                        <p class="hint" data-i18n="alightHint">觀景路</p>
                     </div>
                 </div>
             </section>
-
-            <div class="grid grid-cols-3 gap-2 lg:col-span-2 lg:gap-3" data-i18n-aria="routesAria" aria-label="途經此行程的路線">
-                <div class="rounded-2xl bg-white px-2 py-2.5 text-center shadow-sm ring-1 ring-slate-200/80 sm:px-3 sm:py-4">
-                    <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs" data-i18n="allDay">全日</p>
-                    <p class="text-lg font-bold text-slate-900 sm:text-2xl">E22</p>
+            <div class="routes" data-i18n-aria="routesAria" aria-label="途經此行程的路線">
+                <div class="card">
+                    <p class="lbl" data-i18n="allDay">全日</p>
+                    <p class="name">E22</p>
                 </div>
-                <div class="rounded-2xl bg-white px-2 py-2.5 text-center shadow-sm ring-1 ring-slate-200/80 sm:px-3 sm:py-4">
-                    <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs" data-i18n="peak">繁忙時間</p>
-                    <p class="text-lg font-bold text-slate-900 sm:text-2xl">E22X</p>
+                <div class="card">
+                    <p class="lbl" data-i18n="peak">繁忙時間</p>
+                    <p class="name">E22X</p>
                 </div>
-                <div class="rounded-2xl bg-white px-2 py-2.5 text-center shadow-sm ring-1 ring-slate-200/80 sm:px-3 sm:py-4">
-                    <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs" data-i18n="cityflyer">機場快線</p>
-                    <p class="text-lg font-bold text-slate-900 sm:text-2xl">A22</p>
+                <div class="card">
+                    <p class="lbl" data-i18n="cityflyer">機場快線</p>
+                    <p class="name">A22</p>
                 </div>
             </div>
         </div>
-        <p id="mobile-status" class="mt-2 text-xs font-medium text-emerald-700 sm:hidden"></p>
-
-        <div id="eta-container" class="mt-3 grid grid-cols-1 gap-3 sm:mt-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-4" aria-live="polite">
-            <div class="col-span-full animate-pulse rounded-2xl bg-white p-6 text-center text-sm text-slate-400 shadow-sm" data-i18n="loading">正在載入到站時間…</div>
+        <p id="mobile-status"></p>
+        <div id="eta-container" aria-live="polite">
+            <div class="banner loading" data-i18n="loading">正在載入到站時間…</div>
         </div>
-
-        <details class="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-600 shadow-sm ring-1 ring-slate-200/80 sm:p-5">
-            <summary class="min-h-11 cursor-pointer list-none font-semibold text-slate-800" data-i18n="corridorTitle">本走廊路線說明</summary>
-            <ul class="mt-3 list-disc space-y-2 pl-5 text-slate-600">
+        <details class="notes">
+            <summary data-i18n="corridorTitle">本走廊路線說明</summary>
+            <ul>
                 <li data-i18n="noteE22"></li>
                 <li data-i18n="noteE22X"></li>
                 <li data-i18n="noteA22"></li>
                 <li data-i18n="noteSkip"></li>
             </ul>
         </details>
-
-        <footer class="mt-5 px-1 pb-4 text-center text-[11px] leading-relaxed text-slate-400">
+        <footer class="site">
             <span data-i18n="footerBefore">資料來源：</span>
-            <a href="https://data.gov.hk" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">DATA.GOV.HK</a>
+            <a href="https://data.gov.hk" target="_blank" rel="noopener noreferrer">DATA.GOV.HK</a>
             <span data-i18n="footerAfter">城巴開放數據。到站時間僅供參考。</span>
         </footer>
     </main>
 
     <script>
         (function () {
-            const API_BASE = "https://rt.data.gov.hk/v2/transport/citybus";
-            const COMPANY = "CTB";
-            const BOARD_STOP_ID = "001500";
-            const REFRESH_MS = 30000;
-            const LANG_KEY = "bus-eta-lang";
-            const ROUTES = ["E22", "E22X", "A22"];
-
-            const I18N = {
+            "use strict";
+            var API_BASE = "https://rt.data.gov.hk/v2/transport/citybus";
+            var COMPANY = "CTB";
+            var BOARD_STOP_ID = "001500";
+            var REFRESH_MS = 30000;
+            var FETCH_MS = 12000;
+            var LANG_KEY = "bus-eta-lang";
+            var ROUTES = ["E22", "E22X", "A22"];
+            var I18N = {
                 "zh-HK": {
                     htmlLang: "zh-HK",
                     documentTitle: "九龍灣 → 航天城 · 巴士到站時間",
@@ -161,6 +433,7 @@
                     cityflyer: "機場快線",
                     routesAria: "途經此行程的路線",
                     refreshAria: "重新整理",
+                    langGroup: "語言",
                     loading: "正在載入到站時間…",
                     updating: "更新中…",
                     live: "實時",
@@ -185,8 +458,7 @@
                     noteA22: "A22 — 藍田站往機場。官方站位包括航天城；城巴註明部分早上班次繞經航天城，其他班次或直達客運大樓。",
                     noteSkip: "未列出：A29／NA29 停九龍灣站但不經航天城（往一號客運大樓）。E22A／E22C／E22P 停航天城但不經九龍灣站（E22P 最近為坪石邨）。",
                     footerBefore: "資料來源：",
-                    footerAfter: "城巴開放數據。到站時間僅供參考。",
-                    langGroup: "語言"
+                    footerAfter: "城巴開放數據。到站時間僅供參考。"
                 },
                 en: {
                     htmlLang: "en",
@@ -205,6 +477,7 @@
                     cityflyer: "Cityflyer",
                     routesAria: "Routes that serve this journey",
                     refreshAria: "Refresh bus arrivals",
+                    langGroup: "Language",
                     loading: "Fetching upcoming arrivals…",
                     updating: "Updating…",
                     live: "Live",
@@ -226,43 +499,44 @@
                     corridorTitle: "Routes on this corridor",
                     noteE22: "E22 — Lam Tin (North) → SKYCITY. Stops at Kowloon Bay Station then Cathay Pacific City. Main all-day service.",
                     noteE22X: "E22X — Yau Tong → SKYCITY. Same two stops. Weekday peak only; empty ETA is normal outside service hours.",
-                    noteA22: "A22 — Lam Tin Station → Airport. Official stop list includes Cathay Pacific City. Citybus notes some morning trips divert via Cathay City; others may go to the passenger terminal only.",
+                    noteA22: "A22 — Lam Tin Station → Airport. Official stop list includes Cathay Pacific City. Some morning trips divert via Cathay City; others may go to the passenger terminal only.",
                     noteSkip: "Not shown: A29 / NA29 stop at Kowloon Bay Station but skip Cathay Pacific City (Airport Terminal 1). E22A / E22C / E22P serve Cathay Pacific City but skip Kowloon Bay Station (E22P nearest is Ping Shek Estate).",
                     footerBefore: "Data from ",
-                    footerAfter: " Citybus Open API. Times are estimates only.",
-                    langGroup: "Language"
+                    footerAfter: " Citybus Open API. Times are estimates only."
                 }
             };
 
-            const container = document.getElementById("eta-container");
-            const timeSpan = document.getElementById("update-time");
-            const liveStatus = document.getElementById("live-status");
-            const mobileStatus = document.getElementById("mobile-status");
-            const refreshBtn = document.getElementById("refresh-btn");
-            const refreshIcon = document.getElementById("refresh-icon");
-            const langZh = document.getElementById("lang-zh");
-            const langEn = document.getElementById("lang-en");
+            var container = document.getElementById("eta-container");
+            var timeSpan = document.getElementById("update-time");
+            var liveStatus = document.getElementById("live-status");
+            var mobileStatus = document.getElementById("mobile-status");
+            var refreshBtn = document.getElementById("refresh-btn");
+            var refreshIcon = document.getElementById("refresh-icon");
+            var langZh = document.getElementById("lang-zh");
+            var langEn = document.getElementById("lang-en");
+            var langGroup = document.querySelector(".lang");
 
-            let inflight = null;
-            let lastResults = null;
-            let lastUpdatedAt = null;
-            let lang = "zh-HK";
+            var inflight = null;
+            var lastResults = null;
+            var lastUpdatedAt = null;
+            var lang = "zh-HK";
+            var timer = null;
 
             function t(key) {
-                const pack = I18N[lang] || I18N["zh-HK"];
+                var pack = I18N[lang] || I18N["zh-HK"];
                 return pack[key] || key;
             }
 
             function detectLang() {
                 try {
-                    const saved = localStorage.getItem(LANG_KEY);
+                    var saved = localStorage.getItem(LANG_KEY);
                     if (saved === "en" || saved === "zh-HK") return saved;
-                } catch (e) { /* ignore quota / private mode */ }
+                } catch (e) { /* private mode */ }
                 return "zh-HK";
             }
 
             function applyLang() {
-                const pack = I18N[lang];
+                var pack = I18N[lang];
                 document.documentElement.lang = pack.htmlLang;
                 document.title = pack.documentTitle;
                 document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -271,8 +545,9 @@
                 document.querySelectorAll("[data-i18n-aria]").forEach(function (el) {
                     el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria")));
                 });
-                langZh.className = toggleClass(lang === "zh-HK");
-                langEn.className = toggleClass(lang === "en");
+                if (langGroup) langGroup.setAttribute("aria-label", t("langGroup"));
+                langZh.className = lang === "zh-HK" ? "is-on" : "";
+                langEn.className = lang === "en" ? "is-on" : "";
                 langZh.setAttribute("aria-pressed", lang === "zh-HK" ? "true" : "false");
                 langEn.setAttribute("aria-pressed", lang === "en" ? "true" : "false");
                 writeUpdatedTime(lastUpdatedAt);
@@ -284,17 +559,7 @@
                     timeSpan.textContent = t("loading");
                     return;
                 }
-                const stamp = when.toLocaleTimeString(lang === "en" ? "en-HK" : "zh-HK", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: lang === "en"
-                });
-                timeSpan.textContent = t("updated") + " " + stamp + " · " + t("stopHint");
-            }
-
-            function toggleClass(active) {
-                return "rounded-full px-2.5 py-1.5 min-h-11 sm:min-h-0 " +
-                    (active ? "bg-white text-blue-700" : "text-white/85");
+                timeSpan.textContent = t("updated") + " " + formatClock(when.toISOString()) + " · " + t("stopHint");
             }
 
             function setLang(next) {
@@ -304,7 +569,7 @@
             }
 
             function escapeHtml(value) {
-                return String(value ?? "")
+                return String(value == null ? "" : value)
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;")
@@ -314,14 +579,14 @@
 
             function minutesUntil(iso) {
                 if (!iso) return null;
-                const eta = new Date(iso);
-                if (Number.isNaN(eta.getTime())) return null;
+                var eta = new Date(iso);
+                if (isNaN(eta.getTime())) return null;
                 return Math.round((eta.getTime() - Date.now()) / 60000);
             }
 
             function formatClock(iso) {
-                const eta = new Date(iso);
-                if (Number.isNaN(eta.getTime())) return "";
+                var eta = iso instanceof Date ? iso : new Date(iso);
+                if (isNaN(eta.getTime())) return "";
                 return eta.toLocaleTimeString(lang === "en" ? "en-HK" : "zh-HK", {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -342,101 +607,74 @@
             }
 
             function etaTone(mins) {
-                if (mins === null) return "text-slate-400";
-                if (mins <= 1) return "text-emerald-600";
-                if (mins <= 8) return "text-blue-600";
-                return "text-slate-900";
+                if (mins === null) return "tone-na";
+                if (mins <= 1) return "tone-due";
+                if (mins <= 8) return "tone-soon";
+                return "tone-later";
             }
 
             function setStatus(kind, extra) {
-                let text = t(kind);
-                if (kind === "live" && extra != null) {
-                    text = t("live") + " · " + extra + " " + t("buses");
-                }
-                const tones = {
-                    updating: "wait",
-                    live: "live",
-                    noDue: "wait",
-                    apiDown: "bad",
-                    failed: "bad"
-                };
-                const tone = tones[kind] || "live";
-                const classes = {
-                    live: "text-emerald-100",
-                    wait: "text-amber-100",
-                    bad: "text-red-100"
-                };
-                const mobileClasses = {
-                    live: "text-emerald-700",
-                    wait: "text-amber-700",
-                    bad: "text-red-700"
-                };
+                var text = t(kind);
+                if (kind === "live" && extra != null) text = t("live") + " · " + extra + " " + t("buses");
+                var tone = { updating: "wait", live: "live", noDue: "wait", apiDown: "bad", failed: "bad" }[kind] || "live";
                 liveStatus.textContent = text;
-                liveStatus.className = "hidden rounded-full bg-white/15 px-2 py-1 text-[11px] font-semibold sm:inline " + (classes[tone] || classes.live);
+                liveStatus.className = tone === "wait" ? "status-wait" : tone === "bad" ? "status-bad" : "";
                 mobileStatus.textContent = text;
-                mobileStatus.className = "mt-2 text-xs font-medium sm:hidden " + (mobileClasses[tone] || mobileClasses.live);
+                mobileStatus.className = tone === "wait" ? "status-wait" : tone === "bad" ? "status-bad" : "";
             }
 
-            async function fetchJson(url, signal) {
-                const response = await fetch(url, {
-                    signal,
+            function fetchJson(url, signal) {
+                var timeout = new AbortController();
+                var timerId = setTimeout(function () { timeout.abort(); }, FETCH_MS);
+                var combined = (typeof AbortSignal !== "undefined" && AbortSignal.any)
+                    ? AbortSignal.any([signal, timeout.signal])
+                    : signal;
+                return fetch(url, {
+                    signal: combined,
                     cache: "no-store",
+                    credentials: "omit",
+                    mode: "cors",
+                    referrerPolicy: "no-referrer",
                     headers: { Accept: "application/json" }
+                }).then(function (response) {
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return response.json();
+                }).finally(function () {
+                    clearTimeout(timerId);
                 });
-                if (!response.ok) {
-                    throw new Error("HTTP " + response.status);
-                }
-                return response.json();
             }
 
             function destLine(dest) {
-                if (lang === "en") return t("destPrefix") + " " + dest;
-                return t("destPrefix") + dest;
+                return lang === "en" ? t("destPrefix") + " " + dest : t("destPrefix") + dest;
             }
-                const mins = minutesUntil(item.eta);
-                const remark = lang === "en"
-                    ? (item.rmk_en || item.rmk_tc || "")
-                    : (item.rmk_tc || item.rmk_en || "");
-                const dest = lang === "en"
-                    ? (item.dest_en || item.dest_tc || "")
-                    : (item.dest_tc || item.dest_en || "");
-                const ring = isNext ? "ring-2 ring-blue-500 bg-blue-50/80" : "ring-1 ring-slate-200/80 bg-white";
+
+            function arrivalCard(item, isNext) {
+                var mins = minutesUntil(item.eta);
+                var remark = lang === "en" ? (item.rmk_en || item.rmk_tc || "") : (item.rmk_tc || item.rmk_en || "");
+                var dest = lang === "en" ? (item.dest_en || item.dest_tc || "") : (item.dest_tc || item.dest_en || "");
                 return (
-                    '<article class="flex items-center gap-3 rounded-2xl p-3 shadow-sm sm:p-4 ' + ring + '">' +
-                        '<div class="flex h-12 min-w-[3.75rem] shrink-0 items-center justify-center rounded-xl bg-blue-600 px-2 text-lg font-bold text-white">' +
-                            escapeHtml(item.route) +
+                    '<article class="eta-card' + (isNext ? " is-next" : "") + '">' +
+                        '<div class="badge">' + escapeHtml(item.route) + "</div>" +
+                        '<div class="eta-body">' +
+                            '<p class="dest">' + escapeHtml(destLine(dest)) + "</p>" +
+                            '<p class="sub">' + escapeHtml(remark || (isNext ? t("next") : t("following"))) + "</p>" +
                         "</div>" +
-                        '<div class="min-w-0 flex-1">' +
-                            '<p class="truncate text-sm font-semibold text-slate-900">' +
-                                escapeHtml(destLine(dest)) +
-                            "</p>" +
-                            '<p class="mt-0.5 text-[11px] text-slate-500">' +
-                                escapeHtml(remark || (isNext ? t("next") : t("following"))) +
-                            "</p>" +
-                        "</div>" +
-                        '<div class="shrink-0 text-right">' +
-                            '<div class="flex items-baseline justify-end gap-1">' +
-                                '<span class="text-[1.65rem] font-bold leading-none tabular-nums sm:text-3xl ' + etaTone(mins) + '">' +
-                                    escapeHtml(etaLabel(mins)) +
-                                "</span>" +
-                                '<span class="text-[11px] font-semibold text-slate-400">' +
-                                    escapeHtml(etaUnit(mins)) +
-                                "</span>" +
+                        '<div class="eta-time">' +
+                            '<div class="mins">' +
+                                '<b class="' + etaTone(mins) + '">' + escapeHtml(etaLabel(mins)) + "</b>" +
+                                "<span>" + escapeHtml(etaUnit(mins)) + "</span>" +
                             "</div>" +
-                            (item.eta
-                                ? '<p class="mt-0.5 text-[10px] tabular-nums text-slate-400">' + escapeHtml(formatClock(item.eta)) + "</p>"
-                                : "") +
+                            (item.eta ? '<p class="clock">' + escapeHtml(formatClock(item.eta)) + "</p>" : "") +
                         "</div>" +
                     "</article>"
                 );
             }
 
             function flattenArrivals(results) {
-                const rows = [];
+                var rows = [];
                 results.forEach(function (r) {
                     (r.arrivals || []).forEach(function (item) {
-                        if (!item || !item.eta) return;
-                        rows.push(item);
+                        if (item && item.eta) rows.push(item);
                     });
                 });
                 rows.sort(function (a, b) {
@@ -446,98 +684,86 @@
             }
 
             function renderResults(results) {
-                const failed = results.filter(function (r) { return r.error; });
-                const arrivals = flattenArrivals(results);
-
+                var failed = results.filter(function (r) { return r.error; });
+                var arrivals = flattenArrivals(results);
                 if (failed.length === ROUTES.length && !arrivals.length) {
-                    container.innerHTML =
-                        '<div class="col-span-full rounded-2xl bg-red-50 p-4 text-center text-sm text-red-700">' +
-                        escapeHtml(t("fetchFail")) +
-                        "</div>";
+                    container.innerHTML = '<div class="banner error">' + escapeHtml(t("fetchFail")) + "</div>";
                     setStatus("apiDown");
                     return;
                 }
-
                 if (!arrivals.length) {
-                    container.innerHTML =
-                        '<div class="col-span-full rounded-2xl bg-amber-50 p-4 text-center text-sm text-amber-800">' +
-                        escapeHtml(t("empty")) +
-                        "</div>";
+                    container.innerHTML = '<div class="banner empty">' + escapeHtml(t("empty")) + "</div>";
                     setStatus("noDue");
                     return;
                 }
-
                 container.innerHTML = arrivals.map(function (item, i) {
                     return arrivalCard(item, i === 0);
                 }).join("");
                 setStatus("live", arrivals.length);
             }
 
-            async function fetchRouteEta(route, signal) {
-                const url = API_BASE + "/eta/" + COMPANY + "/" + BOARD_STOP_ID + "/" + encodeURIComponent(route);
-                try {
-                    const payload = await fetchJson(url, signal);
-                    const rows = Array.isArray(payload && payload.data) ? payload.data : [];
-                    const arrivals = rows.filter(function (row) {
-                        return row && row.dir === "O" && row.route === route;
-                    });
-                    return { route: route, arrivals: arrivals, error: null };
-                } catch (err) {
+            function fetchRouteEta(route, signal) {
+                var url = API_BASE + "/eta/" + COMPANY + "/" + BOARD_STOP_ID + "/" + encodeURIComponent(route);
+                return fetchJson(url, signal).then(function (payload) {
+                    var rows = payload && Array.isArray(payload.data) ? payload.data : [];
                     return {
                         route: route,
-                        arrivals: [],
-                        error: err && err.name === "AbortError" ? null : (err && err.message) || "Failed"
+                        arrivals: rows.filter(function (row) {
+                            return row && row.dir === "O" && row.route === route;
+                        }),
+                        error: null
                     };
-                }
+                }).catch(function (err) {
+                    if (err && err.name === "AbortError" && inflight && inflight.signal.aborted) {
+                        return { route: route, arrivals: [], error: null };
+                    }
+                    return { route: route, arrivals: [], error: (err && err.message) || "Failed" };
+                });
             }
 
-            async function fetchBusData() {
+            function fetchBusData() {
+                if (typeof document !== "undefined" && document.hidden) return;
                 if (inflight) inflight.abort();
                 inflight = new AbortController();
-                const signal = inflight.signal;
-
+                var signal = inflight.signal;
                 refreshBtn.disabled = true;
-                refreshIcon.classList.add("animate-spin");
+                refreshIcon.classList.add("spin");
                 setStatus("updating");
-
-                try {
-                    const results = await Promise.all(
-                        ROUTES.map(function (route) {
-                            return fetchRouteEta(route, signal);
-                        })
-                    );
+                Promise.all(ROUTES.map(function (route) {
+                    return fetchRouteEta(route, signal);
+                })).then(function (results) {
                     if (signal.aborted) return;
                     lastResults = results;
                     lastUpdatedAt = new Date();
                     renderResults(results);
                     writeUpdatedTime(lastUpdatedAt);
-                } catch (error) {
+                }).catch(function (error) {
                     if (error && error.name === "AbortError") return;
                     lastResults = null;
                     setStatus("failed");
-                    container.innerHTML =
-                        '<div class="col-span-full rounded-2xl bg-red-50 p-4 text-center text-sm text-red-700">' +
-                        escapeHtml(t("fetchFail")) +
-                        "</div>";
-                    timeSpan.textContent = t("lastAttempt") + " " + new Date().toLocaleTimeString(lang === "en" ? "en-HK" : "zh-HK", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: lang === "en"
-                    });
-                } finally {
+                    container.innerHTML = '<div class="banner error">' + escapeHtml(t("fetchFail")) + "</div>";
+                    timeSpan.textContent = t("lastAttempt") + " " + formatClock(new Date());
+                }).finally(function () {
                     refreshBtn.disabled = false;
-                    refreshIcon.classList.remove("animate-spin");
-                }
+                    refreshIcon.classList.remove("spin");
+                });
             }
 
             langZh.addEventListener("click", function () { setLang("zh-HK"); });
             langEn.addEventListener("click", function () { setLang("en"); });
             refreshBtn.addEventListener("click", fetchBusData);
+            document.addEventListener("visibilitychange", function () {
+                if (!document.hidden) fetchBusData();
+            });
 
             lang = detectLang();
             applyLang();
             fetchBusData();
-            setInterval(fetchBusData, REFRESH_MS);
+            timer = setInterval(fetchBusData, REFRESH_MS);
+            window.addEventListener("pagehide", function () {
+                if (inflight) inflight.abort();
+                if (timer) clearInterval(timer);
+            });
         })();
     </script>
 </body>
